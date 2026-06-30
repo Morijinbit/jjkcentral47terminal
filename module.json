@@ -1,0 +1,26 @@
+{
+  "id": "jjk-central47",
+  "title": "JJK – Central 47 Database Terminal",
+  "description": "Jujutsu Sorcery Commission classified network terminal. Opens from the Journal sidebar — available to all players and the GM for in-session roleplay access.",
+  "version": "1.1.0",
+  "compatibility": {
+    "minimum": "11",
+    "verified": "12"
+  },
+  "description-changes": "v1.1.0 — Newswire channel, desktop burger drawer, F–S overall stat grades, full lore/grade corrections, and the offline cursegate forum engine with recurring posters.",
+  "authors": [
+    {
+      "name": "Campaign GM"
+    }
+  ],
+  "scripts": [
+    "scripts/central47.js"
+  ],
+  "esmodules": [],
+  "styles": [],
+  "packs": [],
+  "socket": false,
+  "url": "",
+  "manifest": "",
+  "download": ""
+}
