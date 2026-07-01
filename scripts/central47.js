@@ -204,16 +204,41 @@
     }
   });
 
-  // ── Ready hook – expose on module object + log ────────────────
+  // ── Ready hook – expose on module object + socket bridge ──────
   Hooks.once("ready", () => {
     const mod = game.modules.get(MODULE_ID);
-    if (mod) {
-      // GMs can call this from a macro:
-      // game.modules.get("jjk-central47").openTerminal()
-      mod.openTerminal = openTerminal;
-    }
+    if (mod) mod.openTerminal = openTerminal;
+
+    // ── Forum sync bridge ─────────────────────────────────────────
+    // iframe → socket: player's terminal posts new threads/replies
+    window.addEventListener("message", (e) => {
+      if (!e.data || e.data.type !== "c47_forum_sync") return;
+      // only forward if it came from our terminal iframe
+      if (_instance && _instance._frameEl &&
+          e.source !== _instance._frameEl.contentWindow) return;
+      game.socket.emit("module." + MODULE_ID, {
+        type:    "c47_forum_sync",
+        _from:   game.user?.id,
+        threads: e.data.threads || [],
+        adds:    e.data.adds    || {}
+      });
+    });
+
+    // socket → iframe: receive another player's post/replies
+    game.socket.on("module." + MODULE_ID, (data) => {
+      if (!data || data.type !== "c47_forum_sync") return;
+      if (data._from === game.user?.id) return; // ignore own echo
+      if (_instance && _instance.rendered && _instance._frameEl) {
+        _instance._frameEl.contentWindow.postMessage({
+          type:    "c47_forum_receive",
+          threads: data.threads || [],
+          adds:    data.adds    || {}
+        }, "*");
+      }
+    });
+
     console.log(
-      "%c⚡ Central 47 Database Terminal | Loaded",
+      "%c⚡ Central 47 Database Terminal v1.1 | Loaded",
       "color:#5a8a3a;font-family:monospace;font-weight:bold;"
     );
   });
